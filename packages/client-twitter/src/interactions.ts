@@ -144,7 +144,7 @@ export class TwitterInteractionClient {
 
                     if (existingResponse) {
                         elizaLogger.log(
-                            `Already responded to tweet ${tweet.id}, skipping`
+                            `Already responded to tweet ${tweet.id}, skipping for ${this.client.profile.username}`
                         );
                         continue;
                     }

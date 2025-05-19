@@ -5,7 +5,6 @@ import { DirectClientInterface } from "@ai16z/client-direct";
 import { DiscordClientInterface } from "@ai16z/client-discord";
 import { TelegramClientInterface } from "@ai16z/client-telegram";
 import { TwitterClientInterface } from "@ai16z/client-twitter";
-import { FarcasterAgentClient } from "@ai16z/client-farcaster";
 import {
     AgentRuntime,
     CacheManager,
@@ -25,7 +24,6 @@ import {
     validateCharacterConfig,
 } from "@ai16z/eliza";
 import { zgPlugin } from "@ai16z/plugin-0g";
-import createGoatPlugin from "@ai16z/plugin-goat";
 import { bootstrapPlugin } from "@ai16z/plugin-bootstrap";
 // import { buttplugPlugin } from "@ai16z/plugin-buttplug";
 import {
@@ -39,7 +37,7 @@ import {
 import { confluxPlugin } from "@ai16z/plugin-conflux";
 import { imageGenerationPlugin } from "@ai16z/plugin-image-generation";
 import { evmPlugin } from "@ai16z/plugin-evm";
-import { createNodePlugin } from "@ai16z/plugin-node";
+//import { createNodePlugin } from "@ai16z/plugin-node";
 import { solanaPlugin } from "@ai16z/plugin-solana";
 import { teePlugin, TEEMode } from "@ai16z/plugin-tee";
 import { aptosPlugin, TransferAptosToken } from "@ai16z/plugin-aptos";
@@ -219,13 +217,6 @@ export function getTokenForProvider(
                 character.settings?.secrets?.OPENAI_API_KEY ||
                 settings.OPENAI_API_KEY
             );
-        case ModelProviderName.ANTHROPIC:
-            return (
-                character.settings?.secrets?.ANTHROPIC_API_KEY ||
-                character.settings?.secrets?.CLAUDE_API_KEY ||
-                settings.ANTHROPIC_API_KEY ||
-                settings.CLAUDE_API_KEY
-            );
         case ModelProviderName.REDPILL:
             return (
                 character.settings?.secrets?.REDPILL_API_KEY ||
@@ -334,12 +325,6 @@ export async function initializeClients(
         clients.push(twitterClients);
     }
 
-    if (clientTypes.includes("farcaster")) {
-        const farcasterClients = new FarcasterAgentClient(runtime);
-        farcasterClients.start();
-        clients.push(farcasterClients);
-    }
-
     if (character.plugins?.length > 0) {
         for (const plugin of character.plugins) {
             if (plugin.clients) {
@@ -371,7 +356,7 @@ export async function createAgent(
         character.name
     );
 
-    nodePlugin ??= createNodePlugin();
+    //nodePlugin ??= createNodePlugin();
 
     const teeMode = getSecret(character, "TEE_MODE") || "OFF";
     const walletSecretSalt = getSecret(character, "WALLET_SECRET_SALT");
@@ -383,10 +368,6 @@ export async function createAgent(
         );
         throw new Error("Invalid TEE configuration");
     }
-
-    const goatPlugin = await createGoatPlugin((secret) =>
-        getSecret(character, secret)
-    );
 
     return new AgentRuntime({
         databaseAdapter: db,
@@ -436,7 +417,6 @@ export async function createAgent(
             getSecret(character, "COINBASE_NOTIFICATION_URI")
                 ? webhookPlugin
                 : null,
-            getSecret(character, "ALCHEMY_API_KEY") ? goatPlugin : null,
             getSecret(character, "FLOW_ADDRESS") &&
             getSecret(character, "FLOW_PRIVATE_KEY")
                 ? flowPlugin
